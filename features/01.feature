@@ -4,7 +4,6 @@ Feature: NIP-01
   So that I can interact with the server
 
   Background:
-    Given the server is running
     Given a WebSocket connection is established
 
   Scenario:

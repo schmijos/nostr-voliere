@@ -4,8 +4,7 @@ require "async"
 require_relative "../../app"
 
 module ServerWorld
-  def start_server
-    # Start the server in a separate thread
+  def self.start_server
     @server_thread = Thread.new do
       Async do
         Falcon::Server.new(
@@ -14,22 +13,21 @@ module ServerWorld
         ).run.each(&:wait)
       end
     end
-    sleep 1  # Give some time for the server to start
+    sleep 1
   end
 
-  def stop_server
-    # Stop the server thread
+  def self.stop_server
     @server_thread&.kill
   end
 end
 
-World(Minitest::Assertions, ServerWorld)
+World(Minitest::Assertions)
 
 BeforeAll do
-  start_server
+  ServerWorld.start_server
 end
 
 AfterAll do
-  stop_server
+  ServerWorld.stop_server
 end
 
