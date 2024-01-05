@@ -15,13 +15,20 @@ class App
         connection.flush
       end
 
-      while (message = connection.read)
-        if fuzzy_fail?(message)
+      while (text = connection.read)
+        if fuzzy_fail?(text)
           render["NOTICE", "See https://github.com/nostr-protocol/nips/blob/master/01.md"]
           next
         end
 
-        case JSON.parse(message)
+        begin
+          message = JSON.parse(text)
+        rescue JSON::ParserError => error
+          render["NOTICE", error.message]
+          next
+        end
+
+        case message
         in ["EVENT", event]
           record_event(event)
           render["OK", event["id"], true, ""]

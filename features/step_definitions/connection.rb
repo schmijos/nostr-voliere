@@ -1,18 +1,33 @@
 require "async/websocket/client"
 require "async/http/endpoint"
 
-Given(/^a WebSocket connection is established$/) do
+Given(/^there is an event (.*)$/) do |label, text|
+  events[label] = JSON.parse(text)
+end
+
+Given(/^the client is connected to the relay$/) do
   Async do
     endpoint = Async::HTTP::Endpoint.parse("http://127.0.0.1:3000")
     @connection = Async::WebSocket::Client.connect(endpoint)
   end
 end
 
-When(/^the client sends EVENT$/) do
-  @connection.write(["EVENT", { id: 42}].to_json)
+When(/^the client sends$/) do |message|
+  @connection.write(message)
 end
 
-Then(/^the server responds with OK$/) do
-  message = @connection.read
-  assert_equal ["OK", 42, true, ""].to_json, message
+When(/^the client submits event (.*)$/) do |label|
+  @connection.write(["EVENT", events.fetch(label)].to_json)
 end
+
+Then(/^the server responds with ([A-Z]+)$/) do |type|
+  message = @connection.read
+  assert_equal type, JSON.parse(message).first
+end
+
+Then(/^the server responds with event (.*)$/) do |label|
+  type, event = JSON.parse(@connection.read)
+  assert_equal "EVENT", type
+  assert_equal events.fetch(label), event
+end
+

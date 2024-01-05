@@ -1,4 +1,4 @@
-require "minitest/assertions"
+require "minitest"
 require "falcon"
 require "async"
 require_relative "../../app"
@@ -21,7 +21,13 @@ module ServerWorld
   end
 end
 
-World(Minitest::Assertions)
+module EventStore
+  def events
+    @events ||= {}
+  end
+end
+
+World(Minitest::Assertions, EventStore)
 
 BeforeAll do
   ServerWorld.start_server
