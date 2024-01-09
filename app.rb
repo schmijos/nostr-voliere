@@ -47,10 +47,9 @@ class App
               # event = receive_event_from_subscription(subscription_id)
               event = {}
               render["EVENT", subscription_id, event]
-              task.sleep 5
             end
 
-          ensure
+          rescue
             render["CLOSED", subscription_id, "error: subtask died"]
           end
 
