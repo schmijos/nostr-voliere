@@ -37,6 +37,8 @@ Feature: NIP-01 - Subscription protocol
       """
     * the client submits event A
     * the client submits event B
+    * the server responds with OK
+    * the server responds with OK
 
   Scenario: Requesting events with single filter
     When the client sends

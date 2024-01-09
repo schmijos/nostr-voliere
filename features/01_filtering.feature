@@ -37,6 +37,8 @@ Feature: NIP-01 - Client to relay communication - Filtering events
       """
     * the client submits event A
     * the client submits event B
+    * the server responds with OK
+    * the server responds with OK
 
   Scenario: Filtering on event id
     When the client sends
