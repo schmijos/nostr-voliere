@@ -4,6 +4,7 @@ require "debug"
 class App
   def initialize
     @subscriptions = {} # connection => [subscription_id, …]
+    @event_log = File.open("events.log", "a")
   end
 
   def call(env)
@@ -36,17 +37,14 @@ class App
         in ["REQ", subscription_id, *filters]
           @subscriptions[connection].add(subscription_id)
 
-          events = []
-          events.each do |event|
+          past_events(filters).each do |event|
             render["EVENT", subscription_id, event]
           end
           render["EOSE", subscription_id]
 
           Async::Task.current.async(subscription_id) do |task, subscription_id|
             while @subscriptions[connection]&.include?(subscription_id)
-              # event = receive_event_from_subscription(subscription_id)
-              event = {}
-              render["EVENT", subscription_id, event]
+              render["EVENT", subscription_id, inbound_event(filters)]
             end
 
           rescue
@@ -76,6 +74,14 @@ class App
   end
 
   def record_event(event)
-    File.write("events.log", "#{event.to_json}\n", mode: "a")
+    @event_log.write("#{event.to_json}\n")
+  end
+
+  def past_events(filters)
+    [] # grep from event log?
+  end
+
+  def inbound_event(filters)
+    {} # read from named pipe?
   end
 end
