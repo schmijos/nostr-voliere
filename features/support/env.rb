@@ -5,19 +5,30 @@ require_relative "../../app"
 
 module ServerWorld
   def self.start_server
+    @stop_server = false
+
     @server_thread = Thread.new do
-      Async do
-        Falcon::Server.new(
-          Falcon::Server.middleware(App.new),
-          Async::HTTP::Endpoint.parse("http://127.0.0.1:3000")
-        ).run.each(&:wait)
+      Async do |task|
+        endpoint = Async::HTTP::Endpoint.parse("http://127.0.0.1:3000")
+        server = Falcon::Server.new(Falcon::Server.middleware(App.new), endpoint)
+
+        server_task = task.async do
+          server.run
+        end
+
+        until @stop_server
+          task.yield
+          sleep 0.1
+        end
+
+        server_task.stop
       end
     end
-    sleep 1
   end
 
   def self.stop_server
-    @server_thread&.kill
+    @stop_server = true
+    @server_thread&.join
   end
 end
 
@@ -35,5 +46,9 @@ end
 
 AfterAll do
   ServerWorld.stop_server
+end
+
+Around do |_scenario, block|
+  Async { block.call }
 end
 

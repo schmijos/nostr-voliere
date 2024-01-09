@@ -6,10 +6,8 @@ Given(/^there is an event (.*)$/) do |label, text|
 end
 
 Given(/^the client is connected to the relay$/) do
-  Async do
-    endpoint = Async::HTTP::Endpoint.parse("http://127.0.0.1:3000")
-    @connection = Async::WebSocket::Client.connect(endpoint)
-  end
+  @endpoint = Async::HTTP::Endpoint.parse("ws://127.0.0.1:3000")
+  @connection = Async::WebSocket::Client.connect(@endpoint)
 end
 
 When(/^the client sends$/) do |message|
@@ -26,8 +24,12 @@ Then(/^the server responds with ([A-Z]+)$/) do |type|
 end
 
 Then(/^the server responds with event (.*)$/) do |label|
-  type, event = JSON.parse(@connection.read)
+  type, _subscription_id, event = JSON.parse(@connection.read)
   assert_equal "EVENT", type
   assert_equal events.fetch(label), event
+end
+
+After do
+  @connection&.close
 end
 
