@@ -1,10 +1,11 @@
 require "async/websocket/adapters/rack"
 require "debug"
+require_relative "lib/event_log"
 
 class App
   def initialize
     @subscriptions = {} # connection => [subscription_id, …]
-    @event_log = File.open("events.log", "a")
+    @event_log = EventLog.new
   end
 
   def call(env)
@@ -44,7 +45,7 @@ class App
 
           Async::Task.current.async(subscription_id) do |task, subscription_id|
             while @subscriptions[connection]&.include?(subscription_id)
-              render["EVENT", subscription_id, inbound_event(filters)]
+              render["EVENT", subscription_id, await_inbound_event(filters)]
             end
 
           rescue
@@ -74,14 +75,14 @@ class App
   end
 
   def record_event(event)
-    @event_log.write("#{event.to_json}\n")
+    @event_log.write(event)
   end
 
   def past_events(filters)
-    [] # grep from event log?
+    @event_log.read_past(filters)
   end
 
-  def inbound_event(filters)
-    {} # read from named pipe?
+  def await_inbound_event(filters)
+    @event_log.read_future(filters)
   end
 end
