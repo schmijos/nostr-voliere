@@ -15,9 +15,9 @@ class FilterCmd
       when /#\w/
         @and_patterns.prepend value.map { |tag_value| %(["#{key[1..]}","#{tag_value}") }
       when "since"
-        #@range[0] = %("created_at":#{value})
+        # @range[0] = %("created_at":#{value})
       when "until"
-        #@range[1] = %("created_at":#{value})
+        # @range[1] = %("created_at":#{value})
       when "limit"
         @limit = value.to_i
       else

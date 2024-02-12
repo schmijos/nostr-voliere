@@ -47,7 +47,6 @@ class App
             while @subscriptions[connection]&.include?(subscription_id)
               render["EVENT", subscription_id, await_inbound_event(filters)]
             end
-
           rescue
             render["CLOSED", subscription_id, "error: subtask died"]
           end
@@ -60,7 +59,6 @@ class App
           render["NOTICE", "See https://github.com/nostr-protocol/nips/blob/master/01.md"]
         end
       end
-
     ensure
       @subscriptions.delete(connection)
     end or [200, {}, ["WebSocket connections only."]]
@@ -83,6 +81,6 @@ class App
   end
 
   def await_inbound_event(filters)
-    @event_log.read_future(filters)
+    @event_log.await_next(filters)
   end
 end

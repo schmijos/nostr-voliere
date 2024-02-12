@@ -6,7 +6,11 @@ gem "falcon"
 gem "async-websocket"
 
 gem "nostr"
-gem "debug"
+
+group :development, :test do
+  gem "debug"
+  gem "rake"
+end
 
 group :development do
   gem "standard"

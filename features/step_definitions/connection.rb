@@ -32,4 +32,3 @@ end
 After do
   @connection&.close
 end
-

@@ -29,15 +29,15 @@ describe FilterCmd do
 
   describe "#head" do
     def assert_head(filters, expected)
-      _(FilterCmd.new(filters).head).must_equal(expected)
+      assert_equal(expected, FilterCmd.new(filters).head)
     end
 
     it "generates default head" do
-      assert_head( {}, "head -n 100" )
+      assert_head({}, "head -n 100")
     end
 
     it "generates head from filter" do
-      assert_head( {"limit" => 99}, "head -n 99" )
+      assert_head({"limit" => 99}, "head -n 99")
     end
   end
 end

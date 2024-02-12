@@ -51,4 +51,3 @@ end
 Around do |_scenario, block|
   Async { block.call }
 end
-
