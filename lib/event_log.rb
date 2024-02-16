@@ -5,10 +5,11 @@ require_relative "filter_cmd"
 class EventLog
   def initialize(filename = "events.log")
     FileUtils.mkdir_p(File.dirname(filename))
-    @file = File.open(filename, "a")
+    @file = File.open(filename)
   end
 
   def write(event)
+    @file.seek(0, IO::SEEK_END)
     @file.write("#{event.to_json}\n")
     @file.flush
   end
@@ -19,15 +20,20 @@ class EventLog
     bigstring.lines.map { |line| JSON.parse(line) }
   end
 
+  # TODO: Opening a new process for each incoming line is bullshit, but I like the idea of using grep filters
   def await_next(filters)
     cmd = FilterCmd.new(filters)
 
-    # TODO: Opening a new process for each incoming line is bullshit, but I like the idea of using grep filters
-    stdin, stdout, process = Open3.popen2(%(tail -n 0 -f #{@file.path} | #{cmd.grep_chain} --line-buffered))
-    stdin.close # We don't write to the process
+    @file.seek(0, IO::SEEK_END)
+    read_side, write_side = IO.pipe
 
-    line = stdout.readline
-    Process.kill(:INT, process.pid)
+    pid = Process.spawn(%(#{cmd.grep_chain} --line-buffered), in: @file, out: write_side)
+    @file.close # Done writing file to the process
+
+    line = read_side.readline
+    Process.kill(:INT, pid)
+    Process.wait(pid)
+
     JSON.parse(line)
   end
 end
