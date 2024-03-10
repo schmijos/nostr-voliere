@@ -7,14 +7,14 @@ describe FilterCmd do
       _(FilterCmd.new(filters).grep_chain).must_equal(expected)
     end
 
-    it "generates single filter" do
+    it "generates command from single filter conditions" do
       assert_grep_chain(
         {"ids" => %w[abc cde]},
         %(grep -F -e '"id":"abc"' -e '"id":"cde"')
       )
     end
 
-    it "generates multiple filters" do
+    it "generates command from multiple filter conditions" do
       assert_grep_chain(
         {
           "ids" => %w[56dceb906dd5187c53205c34efc3d346008f64d579149e7dbaae8c2077ce1c97 798b52cfd5eae444ef39016f40aa15b3961bcfbaf02b2c18e981ab2b52534226],

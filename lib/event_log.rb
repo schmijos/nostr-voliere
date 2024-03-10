@@ -5,7 +5,7 @@ require_relative "filter_cmd"
 class EventLog
   def initialize(filename = "events.log")
     FileUtils.mkdir_p(File.dirname(filename))
-    @file = File.open(filename)
+    @file = File.open(filename, "a+")
   end
 
   def write(event)
