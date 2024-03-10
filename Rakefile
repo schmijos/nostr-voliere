@@ -5,5 +5,5 @@ require "cucumber/rake/task"
 Minitest::TestTask.create
 
 Cucumber::Rake::Task.new(:features) do |t|
-  t.cucumber_opts = %w[--format pretty]
+  t.cucumber_opts = %w[--format pretty --publish-quiet]
 end
