@@ -47,7 +47,7 @@ describe EventLog do
     end
 
     it "reads past events" do
-      events = @log.read_past({"ids" => %w[ba3508cb615d9ca6743a6afb26d16834abaeb319a5acaa601b8e51aa0dacb65d]})
+      events = @log.read_past([{"ids" => %w[ba3508cb615d9ca6743a6afb26d16834abaeb319a5acaa601b8e51aa0dacb65d]}])
       assert_equal(1, events.length)
       assert_equal("ba3508cb615d9ca6743a6afb26d16834abaeb319a5acaa601b8e51aa0dacb65d", events[0]["id"])
     end
@@ -66,7 +66,7 @@ describe EventLog do
     it "reads future events" do
       Sync do
         inbound_event = Async do
-          @log.await_next({"ids" => %w[44a1c4ba076a44c7bd53a9a876c9b5fc168dfcf5633d5692106940ecdf5ee7ab]})
+          @log.await_next([{"ids" => %w[44a1c4ba076a44c7bd53a9a876c9b5fc168dfcf5633d5692106940ecdf5ee7ab]}])
         end
 
         File.write("tmp/test.log", <<~JSON, mode: "a")

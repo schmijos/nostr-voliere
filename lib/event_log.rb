@@ -1,6 +1,6 @@
 require "json"
 require "open3"
-require_relative "filter_cmd"
+require_relative "multi_filter_cmd"
 
 class EventLog
   def initialize(filename = "events.log")
@@ -15,19 +15,19 @@ class EventLog
   end
 
   def read_past(filters)
-    cmd = FilterCmd.new(filters)
-    bigstring = `tac #{@file.path} | #{cmd.grep_chain} | #{cmd.head}`
+    cmd = "tac #{@file.path} | #{MultiFilterCmd.new(filters).limited_grep}"
+    bigstring = `#{cmd}`
     bigstring.lines.map { |line| JSON.parse(line) }
   end
 
-  # TODO: Opening a new process for each incoming line is bullshit, but I like the idea of using grep filters
+  # TODO: Opening a new process for each incoming line is bullshit, but I somehow like the idea of using grep filters
   def await_next(filters)
-    cmd = FilterCmd.new(filters)
+    cmd = MultiFilterCmd.new(filters).line_grep
 
     @file.seek(0, IO::SEEK_END)
     read_side, write_side = IO.pipe
 
-    pid = Process.spawn(%(#{cmd.grep_chain} --line-buffered), in: @file, out: write_side)
+    pid = Process.spawn(cmd, in: @file, out: write_side)
     @file.close # Done writing file to the process
 
     line = read_side.readline

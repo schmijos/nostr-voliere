@@ -1,21 +1,18 @@
 class FilterCmd
   # @example
-  #   FilterCmd.new([
+  #   FilterCmd.new(
   #     {
-  #       "ids" => ["93421380eaff3494b81293eafb0f3bd36c1d54770469a6626085d6597624372a"],
-  #       "limit" => 1
-  #     }, {
   #       "authors" => ["1c9dcd8fd2d2fb879d6f02d6cc56aeefd74a9678ae48434b0f0de7a21852f704"],
   #       "kinds" => [1],
   #       "#p" => ["f9acb0b034c4c1177e985f14639f317ef0fedee7657c060b146ee790024317ec"],
   #       "limit" => 20
   #     }
-  #   ])
+  #   )
   def initialize(filter)
     @limit = 100
     @and_patterns = []
 
-    filter.each do |(key, value)|
+    filter.each do |key, value|
       case key
       when "ids"
         @and_patterns.prepend value.map { |id| %("id":"#{id}") }
