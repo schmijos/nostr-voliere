@@ -15,7 +15,7 @@ class EventLog
   end
 
   def read_past(filters)
-    cmd = "tac #{@file.path} | #{MultiFilterCmd.new(filters).limited_grep}"
+    cmd = "tac #{@file.path} | #{MultiFilterCmd.new(filters).limited_grep} | awk '!seen[$0]++'"
     bigstring = `#{cmd}`
     bigstring.lines.map { |line| JSON.parse(line) }
   end
