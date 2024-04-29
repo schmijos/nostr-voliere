@@ -28,7 +28,7 @@ class EventLog
     read_side, write_side = IO.pipe
 
     pid = Process.spawn(cmd, in: @file, out: write_side)
-    @file.close # Done writing file to the process
+    # @file.close # Done writing file to the process
 
     line = read_side.readline
     Process.kill(:INT, pid)
