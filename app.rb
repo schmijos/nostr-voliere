@@ -59,6 +59,9 @@ class App
           render["NOTICE", "See https://github.com/nostr-protocol/nips/blob/master/01.md"]
         end
       end
+    rescue
+      puts "\e[35mError:\e[0m #{$!}"
+      puts $!.backtrace
     ensure
       @subscriptions.delete(connection)
     end or [200, {}, ["WebSocket connections only."]]
