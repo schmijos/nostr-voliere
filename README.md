@@ -22,7 +22,7 @@ This proved to be an interesting but difficult idea because of three obstacles:
 
 * Events in the event log are approximately sorted by `created_at`. This solution cannot take advantage of this.
 * I also thought about creating named pipes using `mkfifo` but they block on write rather than before read.
-* One thing I discovered was that ordered JSON [cannot be assumed](https://github.com/nostr-protocol/nips/discussions/1002).
+* One thing I discovered was that ordered nostr event JSON [cannot be assumed](https://github.com/nostr-protocol/nips/discussions/1002).
 
 ## Next trial
 
